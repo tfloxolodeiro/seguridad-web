@@ -3,13 +3,20 @@ import App from './App.tsx'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import { Login } from './Login.tsx'
 import './index.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from './context/AuthContext.tsx'
+
+const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
-
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  </QueryClientProvider>
 )

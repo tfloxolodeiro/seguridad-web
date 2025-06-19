@@ -8,9 +8,13 @@ router.get('/', (req, res) => {
 });
 
 router.get('/terminos', (req, res) => {
-    const producto = req.query.producto;
-    const contenido = fs.readFileSync(`assets/${producto}`)
-    res.send(contenido);
-  });
+  const producto = req.query.producto;
+  const contenido = fs.readFileSync(`assets/${producto}`)
+  res.send(contenido);
+});
+
+router.post('/login', (req, res) => {
+  res.send({ token: (Math.random() * 100000).toFixed().toString() });
+});
 
 export default router;
