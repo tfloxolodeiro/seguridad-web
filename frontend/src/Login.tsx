@@ -7,6 +7,7 @@ import { Alert } from "@mui/material"
 import { useNavigate } from "react-router"
 import { AuthContext } from "./context/AuthContext"
 import { api } from "./lib/axios"
+import type { AxiosError } from "axios"
 
 export const Login = () => {
     const [username, setUsername] = useState("")
@@ -14,7 +15,7 @@ export const Login = () => {
     const { setToken } = useContext(AuthContext)!;
     const navigate = useNavigate()
 
-    const { mutate, isError } = useMutation({
+    const { mutate, error, isError } = useMutation({
         mutationFn: async () => {
             const response = await api.post("/login", { username, password })
             return response.data
@@ -42,7 +43,12 @@ export const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
         />
-        {isError && <Alert severity="error">Credenciales incorrectas</Alert>}
+        {isError && <MensajeError error={error as AxiosError}/>}
         <Button variant="contained" onClick={() => mutate()}>Login</Button>
     </Grid>
+}
+
+const MensajeError = ({error}: {error: AxiosError}) => {
+    const mensaje = error.status === 401 ? "Usuario o contraseña incorrectos" : "Error del servidor"
+    return <Alert severity="error">{mensaje}</Alert>
 }
