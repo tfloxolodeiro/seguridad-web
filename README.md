@@ -14,7 +14,7 @@ En front y back hay que hacer `npm install` y `npm run dev`.
 
 ## Detalles
 
-Frontend es React con Vite. En el setup_db hay algunos usuarios para loggearse.
+Frontend es React con Vite. En el `setup_database.sql` hay algunos usuarios para loggearse.
 Se expone en `http://localhost:5173/`
 
 Backend es Express.
