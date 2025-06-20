@@ -5,6 +5,7 @@ import { Login } from './Login.tsx'
 import './index.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './context/AuthContext.tsx'
+import { PrivateRoute } from './components/PrivateRoute.tsx'
 
 const queryClient = new QueryClient()
 
@@ -13,8 +14,12 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/" element={
+            <PrivateRoute>
+              <App />
+            </PrivateRoute>
+          } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -1,8 +1,10 @@
 import express from 'express';
 import router from './router';
 
-
 const app = express();
+
+// Middleware to parse JSON bodies
+app.use(express.json());
 
 app.use('', router);
 
