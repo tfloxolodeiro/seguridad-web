@@ -8,9 +8,9 @@ router.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-router.get('/terminos', (req, res) => {
-  const producto = req.query.producto;
-  const contenido = fs.readFileSync(`assets/${producto}`)
+router.get('/libro', (req, res) => {
+  const libro = req.query.libro;
+  const contenido = fs.readFileSync(`assets/${libro}`)
   res.send(contenido);
 });
 
