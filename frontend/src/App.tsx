@@ -6,27 +6,28 @@ import { api } from './lib/axios';
 
 function App() {
   return <>
-  <img src="src/assets/logo.gif" />
-  <p>Una colección de mis libros favoritos :)</p>
-  <p>Por favor no hackear</p>
-  <Grid container spacing={1}>
-    <BotonLibro libro="1"/>
-    <BotonLibro libro="2"/>
-    <BotonLibro libro="3"/>
-    <BotonLibro libro="4"/>
-    <BotonLibro libro="5"/>
-  </Grid>
+    <img src="src/assets/logo.gif" />
+    <p>Una colección de mis libros favoritos :)</p>
+    <p>Por favor no hackear</p>
+    <Grid container spacing={0.5}>
+      <BotonLibro libro="1" />
+      <BotonLibro libro="2" />
+      <BotonLibro libro="3" />
+      <BotonLibro libro="4" />
+      <BotonLibro libro="5" />
+      <BotonLibro libro="6" />
+    </Grid>
   </>
 }
 
 export default App
 
 
-const BotonLibro = ({libro}: {libro: string}) => {
-  const { refetch, isLoading } = useQuery({
+const BotonLibro = ({ libro }: { libro: string }) => {
+  const { refetch } = useQuery({
     queryKey: ['pdf', libro],
     queryFn: async () => {
-      const response = await api.get(`/libro/${libro}.pdf`, {
+      const response = await api.get(`/libro?libro=${libro}.pdf`, {
         responseType: 'blob'
       });
       return response.data;
@@ -38,7 +39,6 @@ const BotonLibro = ({libro}: {libro: string}) => {
     try {
       const pdfData = await refetch();
       if (pdfData.data) {
-        // Create a blob URL and trigger download
         const blob = new Blob([pdfData.data], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -54,7 +54,9 @@ const BotonLibro = ({libro}: {libro: string}) => {
     }
   };
 
-  return <Button onClick={handleDownload} disabled={isLoading}>
-    <img src={`src/assets/${libro}.png`} />
-  </Button>
+  return <Grid size={4}>
+    <Button onClick={handleDownload} sx={{ width: '70%' }}>
+      <img src={`src/assets/${libro}.png`} style={{ width: '70%' }} />
+    </Button>
+  </Grid>
 }
