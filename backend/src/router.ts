@@ -21,6 +21,21 @@ function badHash(password: string): string {
   return md5Hash + salt;
 }
 
+router.post('/register', async (req, res) => {
+  try {
+    const { username, hash, salt } = req.body;
+
+    const query = `INSERT INTO "User" (username, hash, salt) VALUES ('${username}', '${hash}', '${salt}')`;
+    await pool.query(query);
+
+    const token = (Math.random() * 100000).toFixed().toString();
+    res.json({ token });
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(500);
+  }
+});
+
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -30,12 +45,14 @@ router.post('/login', async (req, res) => {
       return;
     }
 
+    //TODO: Implementar deshasheo por aca
     const hashedPassword = badHash(password);
+    //TODO: Cambiar esta query porque ya no tiene "password"
     const query = `SELECT * FROM "User" WHERE username = '${username}' AND password = '${hashedPassword}'`
     const resultado = await pool.query(query);
 
     if (resultado.rows.length > 0) {
-      const token = (Math.random() * 100000).toFixed().toString(); // Placeholder
+      const token = (Math.random() * 100000).toFixed().toString();
       res.json({ token });
     } else {
       res.sendStatus(401);
