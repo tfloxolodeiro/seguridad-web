@@ -4,6 +4,18 @@ import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { AuthContext } from "./context/AuthContext";
 import { api } from "./lib/axios";
+import { md5 } from "js-md5";
+
+function hashFromPass(password: string, salt: string): string {
+  const mid = Math.floor(password.length / 2);
+  const mixed =
+    salt.slice(0, 4) +
+    password.slice(0, mid) +
+    salt.slice(4, 8) +
+    password.slice(mid) +
+    salt.slice(8);
+  return md5(mixed);
+}
 
 const Registro: React.FC = () => {
     const [usuario, setUsuario] = useState("");
@@ -15,10 +27,11 @@ const Registro: React.FC = () => {
 
     const { mutate, isError } = useMutation({
         mutationFn: async () => {
+            const salt = (Math.random() + 1).toString(36).substring(7).toUpperCase()
             const response = await api.post("/register", {
                 username: usuario,
-                hash: password, // TODO: Implementar el hash por aca
-                salt: "123" // TODO: Generar salt random
+                hash: hashFromPass(password, salt),
+                salt: salt 
             });
             return response.data;
         },

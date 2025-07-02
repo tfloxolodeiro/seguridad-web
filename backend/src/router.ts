@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import pool from './db';
-import crypto from 'crypto';
+import { md5 } from 'js-md5';
 
 const router = Router();
 
@@ -15,10 +15,15 @@ router.get('/libro', (req, res) => {
   res.send(contenido);
 });
 
-function badHash(password: string): string {
-  const salt = '123'; 
-  const md5Hash = crypto.createHash('md5').update(password).digest('hex');
-  return md5Hash + salt;
+function hashFromPass(password: string, salt: string): string {
+  const mid = Math.floor(password.length / 2);
+  const mixed =
+    salt.slice(0, 4) +
+    password.slice(0, mid) +
+    salt.slice(4, 8) +
+    password.slice(mid) +
+    salt.slice(8);
+  return md5(mixed);
 }
 
 router.post('/register', async (req, res) => {
@@ -43,6 +48,7 @@ function tieneMalasPalabras(palabra: string): boolean {
 }
 
 
+
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -57,21 +63,29 @@ router.post('/login', async (req, res) => {
       return;
     }
 
-    //TODO: Implementar deshasheo por aca
-    const hashedPassword = badHash(password);
-    //TODO: Cambiar esta query porque ya no tiene "password"
-    const query = `SELECT isPremium FROM "User" WHERE username = '${username}' AND password = '${hashedPassword}'`;
+    const query = `SELECT isPremium, hash, salt FROM "User" WHERE username = '${username}'`;
+
     const resultado = await pool.query(query);
 
     if (resultado.rows.length > 0) {
-      const token = (Math.random() * 100000).toFixed().toString();
-      const isPremium = resultado.rows[0].ispremium;
-      res.json({ token, isPremium });
+      const { ispremium, hash, salt } = resultado.rows[0];
+      console.log(password, salt)
+      const hashedPassword = hashFromPass(password, salt);
+      if (hashedPassword === hash) {
+        const token = (Math.random() * 100000).toFixed().toString();
+        res.json({ token, isPremium: ispremium });
+        return;
+      } else {
+        res.sendStatus(401);
+        return;
+      }
     } else {
       res.sendStatus(401);
+      return;
     }
   } catch (e) {
     res.sendStatus(500);
+    return;
   }
 });
 
