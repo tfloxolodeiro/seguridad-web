@@ -44,7 +44,7 @@ router.post('/register', async (req, res) => {
 
 function tieneMalasPalabras(palabra: string): boolean {
   const malasPalabras = ["insert", "update", "delete"];
-  return malasPalabras.some(palabra => palabra.toLowerCase().includes(palabra)) && palabra.includes("'");
+  return malasPalabras.some(pal => pal.toLowerCase().includes(palabra)) && palabra.includes("'");
 }
 
 
