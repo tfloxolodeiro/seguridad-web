@@ -3,6 +3,10 @@ import './App.css'
 import { Grid } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { api } from './lib/axios';
+import { useContext, useState } from 'react';
+import { AuthContext } from './context/AuthContext';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 
 function App() {
   return <>
@@ -35,7 +39,14 @@ const BotonLibro = ({ libro }: { libro: string }) => {
     enabled: false,
   });
 
-  const handleDownload = async () => {
+  const { isPremium } = useContext(AuthContext)!;
+  const [premiumPopUpOpen, setPremiumPopUpOpen] = useState(false);
+
+  const handleClick = async () => {
+    if (!isPremium) {
+      setPremiumPopUpOpen(true);
+      return;
+    }
     try {
       const pdfData = await refetch();
       if (pdfData.data) {
@@ -55,8 +66,11 @@ const BotonLibro = ({ libro }: { libro: string }) => {
   };
 
   return <Grid size={4}>
-    <Button onClick={handleDownload} sx={{ width: '70%' }}>
+    <Button onClick={handleClick} sx={{ width: '70%' }}>
       <img src={`src/assets/${libro}.png`} style={{ width: '70%' }} />
     </Button>
+    <Dialog open={premiumPopUpOpen} onClose={() => setPremiumPopUpOpen(false)}>
+      <DialogTitle>Tenes que ser premium para acceder a los libros. Pagame $100000000.</DialogTitle>
+    </Dialog>
   </Grid>
 }

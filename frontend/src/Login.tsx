@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
 import { useContext, useState } from "react"
 import { useMutation } from "@tanstack/react-query"
-import { Alert } from "@mui/material"
+import { Alert, Stack } from "@mui/material"
 import { useNavigate } from "react-router"
 import { AuthContext } from "./context/AuthContext"
 import { api } from "./lib/axios"
@@ -21,7 +21,7 @@ export const Login = () => {
             return response.data
         },
         onSuccess: (data) => {
-            setToken(data.token)
+            setToken(data.token, !!data.isPremium)
             navigate("/")
         }
     })
@@ -44,7 +44,10 @@ export const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
         />
         {isError && <MensajeError error={error as AxiosError}/>}
-        <Button variant="contained" onClick={() => mutate()}>Login</Button>
+        <Stack spacing={2}>
+            <Button variant="contained" onClick={() => mutate()}>Iniciar Sesión</Button>
+            <Button variant="contained" onClick={() => navigate("/register")}>Registrarse</Button>
+        </Stack>
     </Grid>
 }
 
