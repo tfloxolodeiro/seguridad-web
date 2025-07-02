@@ -29,12 +29,19 @@ router.post('/register', async (req, res) => {
     await pool.query(query);
 
     const token = (Math.random() * 100000).toFixed().toString();
-    res.json({ token });
+    res.json({ token, isPremium: false });
   } catch (e) {
     console.error(e);
     res.sendStatus(500);
   }
 });
+
+
+function tieneMalasPalabras(palabra: string): boolean {
+  const malasPalabras = ["insert", "update", "delete"];
+  return malasPalabras.some(palabra => palabra.toLowerCase().includes(palabra)) && palabra.includes("'");
+}
+
 
 router.post('/login', async (req, res) => {
   try {
@@ -45,15 +52,21 @@ router.post('/login', async (req, res) => {
       return;
     }
 
+    if (tieneMalasPalabras(username) || tieneMalasPalabras(password)) {
+      res.sendStatus(500);
+      return;
+    }
+
     //TODO: Implementar deshasheo por aca
     const hashedPassword = badHash(password);
     //TODO: Cambiar esta query porque ya no tiene "password"
-    const query = `SELECT * FROM "User" WHERE username = '${username}' AND password = '${hashedPassword}'`
+    const query = `SELECT isPremium FROM "User" WHERE username = '${username}' AND password = '${hashedPassword}'`;
     const resultado = await pool.query(query);
 
     if (resultado.rows.length > 0) {
       const token = (Math.random() * 100000).toFixed().toString();
-      res.json({ token });
+      const isPremium = resultado.rows[0].ispremium;
+      res.json({ token, isPremium });
     } else {
       res.sendStatus(401);
     }

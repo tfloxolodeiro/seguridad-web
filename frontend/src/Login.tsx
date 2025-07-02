@@ -21,7 +21,7 @@ export const Login = () => {
             return response.data
         },
         onSuccess: (data) => {
-            setToken(data.token)
+            setToken(data.token, !!data.isPremium)
             navigate("/")
         }
     })

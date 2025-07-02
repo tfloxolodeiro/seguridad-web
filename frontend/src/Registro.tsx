@@ -23,7 +23,7 @@ const Registro: React.FC = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            setToken(data.token);
+            setToken(data.token, false);
             navigate("/");
         },
         onError: () => {
